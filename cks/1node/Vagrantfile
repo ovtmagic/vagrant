@@ -1,0 +1,38 @@
+Vagrant.configure("2") do |config|
+  config.vm.box = "ubuntu/bionic64"
+  #config.vm.box = "debian/stretch64"
+  #TO CHANGE DISK SIZE INSTALL PLUGIN: vagrant plugin install vagrant-disksize
+  #config.disksize.size = '15GB'
+  
+  config.vm.hostname = "MASTER"
+  config.vm.network "private_network", ip: "192.168.50.110", virtualbox__intnet: true
+  config.vm.network "private_network", ip: "192.168.56.110"
+
+  config.vm.box_check_update = false
+
+  if Vagrant.has_plugin?("vagrant-vbguest") then
+    config.vbguest.auto_update = false
+    #config.vbguest.no_install  = true
+  end
+
+  # Customize the amount of memory and cpu on the VM:
+  config.vm.provider "virtualbox" do |vb|
+    vb.memory = "8000"
+    vb.cpus = 2
+    # enable promiscuous mode on the public network
+    vb.customize ["modifyvm", :id, "--nicpromisc2", "allow-all"]
+  end
+
+  # some user configs
+  config.vm.provision "file", source: "./gitconfig", destination: "/home/vagrant/.gitconfig"
+  config.vm.provision "file", source: "./vimrc", destination: "/home/vagrant/.vimrc"
+  config.vm.provision "file", source: "./tmux", destination: "/home/vagrant/.tmux.conf"
+
+  # k8s installation    
+  config.vm.provision "shell", path: "containerd-setup.sh", privileged: false
+  config.vm.provision "shell", path: "install_pkgs.sh", privileged: false
+
+end
+
+# Extra Vagrant configuration
+load File.expand_path("Vagrantfile.extra") if File.exists?("Vagrantfile.extra")

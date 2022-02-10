@@ -1,0 +1,75 @@
+Vagrant.configure("2") do |config|
+
+  config.vm.define "master" do |master|
+    master.vm.box = "ubuntu/bionic64"
+    #TO CHANGE DISK SIZE INSTALL PLUGIN: vagrant plugin install vagrant-disksize
+    #master.disksize.size = '15GB'
+    
+    master.vm.hostname = "MASTER"
+    master.vm.network "private_network", ip: "192.168.50.100", virtualbox__intnet: true
+    master.vm.network "private_network", ip: "192.168.56.100"
+    
+    master.vm.box_check_update = false
+    
+    if Vagrant.has_plugin?("vagrant-vbguest") then
+      master.vbguest.auto_update = false
+      #master.vbguest.no_install  = true
+    end
+    
+    # Customize the amount of memory and cpu on the VM:
+    master.vm.provider "virtualbox" do |vb|
+      vb.memory = "8000"
+      vb.cpus = 2
+      # enable promiscuous mode on the public network
+      vb.customize ["modifyvm", :id, "--nicpromisc2", "allow-all"]
+    end
+    
+    # some user configuration
+    master.vm.provision "file", source: "./gitconfig", destination: "/home/vagrant/.gitconfig"
+    master.vm.provision "file", source: "./vimrc", destination: "/home/vagrant/.vimrc"
+    master.vm.provision "file", source: "./tmux", destination: "/home/vagrant/.tmux.conf"
+    
+    # k8s installation    
+    master.vm.provision "shell", path: "k8sconfig/k8scp.sh", privileged: false
+    master.vm.provision "shell", path: "k8sconfig/setupscript.sh", privileged: false
+    master.vm.provision "shell", path: "k8sconfig/install_pkgs.sh", privileged: false
+  end
+
+
+
+  config.vm.define "worker" do |worker|
+    worker.vm.box = "ubuntu/bionic64"
+    #TO CHANGE DISK SIZE INSTALL PLUGIN: vagrant plugin install vagrant-disksize
+    #worker.disksize.size = '15GB'
+    
+    worker.vm.hostname = "worker"
+    worker.vm.network "private_network", ip: "192.168.50.101", virtualbox__intnet: true
+    worker.vm.network :forwarded_port, guest: 22, host: 2224
+
+    worker.vm.box_check_update = false
+
+    if Vagrant.has_plugin?("vagrant-vbguest") then
+      worker.vbguest.auto_update = false
+      #worker.vbguest.no_install  = true
+    end
+
+    # Customize the amount of memory and cpu on the VM:
+    worker.vm.provider "virtualbox" do |vb|
+      vb.memory = "8000"
+      vb.cpus = 2
+      # enable promiscuous mode on the public network
+      vb.customize ["modifyvm", :id, "--nicpromisc2", "allow-all"]
+    end
+
+    # some user configuration
+    worker.vm.provision "file", source: "./gitconfig", destination: "/home/vagrant/.gitconfig"
+    worker.vm.provision "file", source: "./vimrc", destination: "/home/vagrant/.vimrc"
+    worker.vm.provision "file", source: "./tmux", destination: "/home/vagrant/.tmux.conf"
+
+    # k8s installation    
+    worker.vm.provision "shell", path: "k8sconfig/k8sSecond.sh", privileged: false
+  end
+end
+
+# Extra Vagrant masteruration
+load File.expand_path("Vagrantfile.extra") if File.exists?("Vagrantfile.extra")
