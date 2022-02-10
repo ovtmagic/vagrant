@@ -48,3 +48,14 @@ Thumbs.db
 *.mov
 *.wmv
 
+# Vagrant
+.Vagrant
+Vagrantfile.extra
+
+# LF
+LFS260
+
+# k8s tokens
+k8s_cert
+k8s_token
+
