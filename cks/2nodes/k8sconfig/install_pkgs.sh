@@ -13,13 +13,14 @@ sudo apt-get -y install \
     software-properties-common \
     socat \
     git \
-    aptitude
+    aptitude \
+    jq
 
 # k9s
 echo "***********************************"
 echo "* Installing k9s"
 echo "***********************************"
-curl -SL  https://github.com/derailed/k9s/releases/download/v0.17.1/k9s_Linux_x86_64.tar.gz |tar zxv -C /tmp
+curl -SL  https://github.com/derailed/k9s/releases/download/v0.25.18/k9s_Linux_x86_64.tar.gz |tar zxv -C /tmp
 sudo cp /tmp/k9s /usr/local/bin
 
 # Helm
@@ -29,6 +30,9 @@ echo "***********************************"
 #curl -s https://storage.googleapis.com/kubernetes-helm/helm-v2.16.1-linux-amd64.tar.gz|tar zx
 curl -s https://get.helm.sh/helm-v3.4.2-linux-amd64.tar.gz|tar zx
 sudo cp linux-amd64/helm /usr/local/bin
+
+# add to docker group
+sudo usermod -aG docker vagrant
 
 # User configuration
 USERHOME=/home/vagrant

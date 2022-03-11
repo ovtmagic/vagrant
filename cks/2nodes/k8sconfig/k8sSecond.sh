@@ -55,6 +55,11 @@ echo
 echo "***********************************"
 echo "* Joining worker"
 echo "***********************************"
+kubelet_file="/etc/systemd/system/kubelet.service.d/10-kubeadm.conf"
+sudo sed -i "s/kubelet /kubelet --node-ip=192.168.50.101 /" $kubelet_file
+sudo systemctl daemon-reload
+
 k8s_token=$(cat /vagrant/k8s_token)
 k8s_cert=$(cat /vagrant/k8s_cert|awk '{ print $2; }')
-sudo kubeadm join --token ${k8s_token} 192.168.50.100:6443 --discovery-token-ca-cert-hash sha256:${k8s_cert}
+sudo kubeadm join --token ${k8s_token} 192.168.50.100:6443 --discovery-token-ca-cert-hash sha256:${k8s_cert} \
+    --apiserver-advertise-address  192.168.50.101
