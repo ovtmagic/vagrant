@@ -1,0 +1,40 @@
+Vagrant.configure("2") do |config|
+  config.vm.box = "ubuntu/bionic64"
+  #config.vm.box = "debian/stretch64"
+  #TO CHANGE DISK SIZE INSTALL PLUGIN: vagrant plugin install vagrant-disksize
+  #config.disksize.size = '15GB'
+  
+  config.vm.hostname = "minikube"
+  # Uncoment following line to add a bridge interface
+  #config.vm.network "public_network", bridge: "Realtek PCIe GBE Family Controller"
+  config.vm.network "private_network", ip: "192.168.56.10"
+  #config.vm.network "private_network", type: "dhcp"
+  #config.vm.network :forwarded_port, guest: 22, host: 1234
+
+  config.vm.box_check_update = false
+
+  if Vagrant.has_plugin?("vagrant-vbguest") then
+    config.vbguest.auto_update = false
+    #config.vbguest.no_install  = true
+  end
+
+  # Customize the amount of memory and cpu on the VM:
+  config.vm.provider "virtualbox" do |vb|
+    vb.memory = "6000"
+    #vb.memory = "3072"
+    vb.cpus = 4
+  end
+
+  # some user configs
+  config.vm.provision "file", source: "./gitconfig", destination: "/home/vagrant/.gitconfig"
+  config.vm.provision "file", source: "./vimrc", destination: "/home/vagrant/.vimrc"
+  config.vm.provision "file", source: "./tmux", destination: "/home/vagrant/.tmux.conf"
+    
+  # minikube installation    
+  config.vm.provision "shell", path: "install.sh"
+  
+  # Fix for SCSI controller problem
+  #config.vm.provision "file", source: "./99-vagrant.rules", destination: "/tmp/99-vagrant.rules"
+  #config.vm.provision "shell", inline: "echo 180 > /sys/block/sda/device/timeout; cp /tmp/99-vagrant.rules /etc/udev/rules.d/99-vagrant.rules"
+
+end
