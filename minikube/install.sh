@@ -91,6 +91,7 @@ fi
 echo "Copy .kube/config file"
 mkdir -p /home/vagrant/.kube
 sudo -i kubectl config view --flatten > /home/vagrant/.kube/config
+sudo chown -R vagrant:vagrant /home/vagrant/.kube
 
 echo 'PATH=$PATH:/home/vagrant/bin' >> /home/vagrant/.bashrc
 echo "source <(kubectl completion bash)" >> /home/vagrant/.bashrc
