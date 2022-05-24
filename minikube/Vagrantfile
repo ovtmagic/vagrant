@@ -1,6 +1,10 @@
 Vagrant.configure("2") do |config|
+
+  #config.vm.provider "virtualbox" do |v|
+  #  v.gui = true
+  #end
+
   config.vm.box = "ubuntu/bionic64"
-  #config.vm.box = "debian/stretch64"
   #TO CHANGE DISK SIZE INSTALL PLUGIN: vagrant plugin install vagrant-disksize
   #config.disksize.size = '15GB'
   
@@ -21,7 +25,6 @@ Vagrant.configure("2") do |config|
   # Customize the amount of memory and cpu on the VM:
   config.vm.provider "virtualbox" do |vb|
     vb.memory = "6000"
-    #vb.memory = "3072"
     vb.cpus = 4
   end
 
@@ -33,6 +36,9 @@ Vagrant.configure("2") do |config|
   # minikube installation    
   config.vm.provision "shell", path: "install.sh"
   
+  # Extra Vagrant configuration
+  load File.expand_path("Vagrantfile.extra") if File.exists?("Vagrantfile.extra")
+
   # Fix for SCSI controller problem
   #config.vm.provision "file", source: "./99-vagrant.rules", destination: "/tmp/99-vagrant.rules"
   #config.vm.provision "shell", inline: "echo 180 > /sys/block/sda/device/timeout; cp /tmp/99-vagrant.rules /etc/udev/rules.d/99-vagrant.rules"
