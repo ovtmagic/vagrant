@@ -3,11 +3,11 @@
 
 INSTALL_MINIKUBE="true"
 INSTALL_SAMBA="false"
-MINIKUBE_VERSION="v1.23.2"
-K9S_VERSION="v0.24.9"
-HELM_VERSION="v3.7.1"
-K8S_VERSION="v1.22.4"
-KUBECTL_VERSION="1.21.1-00"
+MINIKUBE_VERSION="latest"
+K9S_VERSION="v0.31.9"
+HELM_VERSION="v3.8.1"
+K8S_VERSION="v1.26.1"
+KUBECTL_VERSION="1.26.1-00"
 
 ENABLE_SSH_SERVER="true"
 
@@ -52,9 +52,9 @@ sudo apt-get install -y kubectl=${KUBECTL_VERSION}
 
 
 # Minikube
-curl -Lo minikube https://storage.googleapis.com/minikube/releases/${MINIKUBE_VERSION}/minikube-linux-amd64 > /dev/null 2>&1
-chmod +x minikube
-sudo cp minikube /usr/local/bin && rm minikube
+curl -LO https://storage.googleapis.com/minikube/releases/${MINIKUBE_VERSION}/minikube-linux-amd64
+sudo install minikube-linux-amd64 /usr/local/bin/minikube
+rm minikube-linux-amd64
 
 
 # Helm
@@ -67,7 +67,7 @@ chmod +x /usr/local/bin/docker-compose
 
 
 # k9s
-curl -SL  https://github.com/derailed/k9s/releases/download/${K9S_VERSION}/k9s_Linux_x86_64.tar.gz |tar zxv -C /tmp
+curl -SL  https://github.com/derailed/k9s/releases/download/${K9S_VERSION}/k9s_Linux_amd64.tar.gz |tar zxv -C /tmp
 sudo cp /tmp/k9s /usr/local/bin
 
 
@@ -76,7 +76,7 @@ sudo cp /tmp/k9s /usr/local/bin
 
 # Install and start minikube --------------------------------------------------------------
 if [[ "$INSTALL_MINIKUBE" == "true" ]]; then
-  sudo -i minikube start --vm-driver=none --kubernetes-version=${K8S_VERSION}
+  sudo -i minikube start --vm-driver=none --kubernetes-version=${K8S_VERSION} --force
   #sudo -i helm init --stable-repo-url https://charts.helm.sh/stable 
   sudo minikube addons enable metrics-server
 fi
