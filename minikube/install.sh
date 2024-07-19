@@ -28,7 +28,8 @@ sudo apt-get -y install \
     make \
     python \
     software-properties-common \
-    jq
+    jq \
+    unzip
 apt-get install -y aptitude git socat conntrack
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
 sudo apt-key fingerprint 0EBFCD88
@@ -85,6 +86,13 @@ fi
 if [[ "$INSTALL_SAMBA" == "true" ]]; then
   sudo apt-get -y install samba
   cat /vagrant/smb.conf >> /etc/samba/smb.conf
+fi
+
+# Install AWS
+if [[ "$INSTALL_AWS" = "false" ]]; then
+  curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+  unzip awscliv2.zip
+  sudo ./aws/install
 fi
 
 # User configuration
