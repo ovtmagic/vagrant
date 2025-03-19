@@ -43,4 +43,4 @@ Vagrant.configure("2") do |config|
 end
 
 # Extra Vagrant configuration
-load File.expand_path("Vagrantfile.extra") if File.exists?("Vagrantfile.extra")
+#load File.expand_path("Vagrantfile.extra") if File.exists?("Vagrantfile.extra")
