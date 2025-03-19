@@ -1,0 +1,6 @@
+--- # Example 3 - roles
+- name: Aplicar limits
+  hosts: labservers
+  become: true
+  roles:
+    - limits

@@ -50,6 +50,7 @@ Thumbs.db
 
 # Vagrant
 .Vagrant
+.vagrant
 Vagrantfile.extra
 
 # LF
@@ -61,3 +62,6 @@ k8s_token
 
 # Work folder
 work
+
+# SSH keys
+authorized_keys

@@ -1,0 +1,45 @@
+--- # Example 1
+- hosts: labservers
+  become: yes
+  vars:
+    target_service: nginx
+    target_state: latest
+  tasks:
+  - debug:
+      var: target_service
+  - name: Install nginx
+    apt:
+      name: "{{ target_service }}"
+      state: "{{ target_state }}"
+    notify: "restart http"
+  - name: Create index.html
+    file:
+      name: /var/www/html/index.html
+      state: touch
+  - name: Create index.html content
+    lineinfile:
+      line: "here is some text: {{ ansible_hostname }}\n {{ ansible_all_ipv4_addresses }}"
+      path: /var/www/html/index.html
+    register: reg_task
+  - debug:
+      msg: "Debug msg: {{ reg_task }}"
+  handlers:
+  - name: Restart nginx
+    service:
+      name: nginx
+      state: restarted
+    listen: "restart http"
+    
+
+
+- hosts: labservers
+  become: yes
+  vars:
+    target_state: latest
+  tasks:
+  - name: Install mysql-client
+    apt:
+      name: mysql-client
+      state: "{{ target_state }}"
+
+    
