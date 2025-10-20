@@ -3,18 +3,21 @@
 
 INSTALL_MINIKUBE="true"
 INSTALL_SAMBA="false"
-MINIKUBE_VERSION="latest"
+#MINIKUBE_VERSION="latest"
+MINIKUBE_VERSION="v1.30.0"
 K9S_VERSION="v0.31.9"
-HELM_VERSION="v3.8.1"
-K8S_VERSION="v1.26.1"
-KUBECTL_VERSION="1.26.1-00"
+HELM_VERSION="v3.18.2"
+K8S_VERSION="v1.27.0-rc.0"
+KUBECTL_VERSION="v1.33.1"
+DOCKER_VERSION="5:27.3.1-1~ubuntu.22.04~jammy"
 
 ENABLE_SSH_SERVER="true"
 
 # SSH SERVER
 if [[ ${ENABLE_SSH_SERVER} == "true" ]];then
   echo "Enabling ssh remote access"
-  sudo sed -i "s/PasswordAuthentication no/#PasswordAuthentication no/" /etc/ssh/sshd_config
+  #sudo sed -i "s/PasswordAuthentication no/#PasswordAuthentication no/" /etc/ssh/sshd_config
+  sudo echo "PasswordAuthentication yes" > /etc/ssh/sshd_config.d/60-cloudimg-settings.conf
   systemctl restart sshd
 fi
 
@@ -39,16 +42,15 @@ sudo add-apt-repository \
    stable"
 sudo apt-get -y update
 # apt-cache madison docker-ce -> to see versions
-sudo apt-get install -y docker-ce
+sudo apt-get install -y docker-ce=${DOCKER_VERSION}
 sudo usermod -aG docker vagrant
 
 
 # Kubernetes
 sudo apt-get update && sudo apt-get install -y apt-transport-https
-curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
-echo "deb https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee -a /etc/apt/sources.list.d/kubernetes.list
-sudo apt-get update
-sudo apt-get install -y kubectl=${KUBECTL_VERSION}
+curl -LO "https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl"
+sudo install kubectl /usr/local/bin/kubectl
+rm kubectl
 
 
 # Minikube
@@ -70,6 +72,14 @@ chmod +x /usr/local/bin/docker-compose
 curl -SL  https://github.com/derailed/k9s/releases/download/${K9S_VERSION}/k9s_Linux_amd64.tar.gz |tar zxv -C /tmp
 sudo cp /tmp/k9s /usr/local/bin
 
+# crictl
+curl -SL https://github.com/kubernetes-sigs/cri-tools/releases/download/v1.33.0/crictl-v1.33.0-linux-amd64.tar.gz | tar zxv -C /tmp
+sudo cp /tmp/crictl /usr/local/bin
+
+# cri-dockerd
+curl -LO  https://github.com/Mirantis/cri-dockerd/releases/download/v0.3.20/cri-dockerd_0.3.20.3-0.ubuntu-jammy_amd64.deb
+sudo apt install -y ./cri-dockerd_0.3.20.3-0.ubuntu-jammy_amd64.deb
+rm cri-dockerd_0.3.20.3-0.ubuntu-jammy_amd64.deb
 
 # Clone repo from kubernets course
 #runuser -l vagrant -c "mkdir -p /home/vagrant/curso;cd /home/vagrant/curso;git clone https://github.com/LevelUpEducation/kubernetes-demo.git"
